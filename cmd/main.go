@@ -5,10 +5,10 @@ import (
 	"go.uber.org/zap"
 	"github.com/labstack/echo/v4"
 	"github.com/vaibhavqwerty/mini-redis/cmd/handlers"
+	"github.com/vaibhavqwerty/mini-redis/internal/api"
 )
 
 func main(){
-	var x int32 = 0
 	fmt.Println("hello")
 	logger, _ := zap.NewProduction()
 	defer func() {
@@ -19,10 +19,15 @@ func main(){
 
 	e := echo.New()
 
-	checkHealthHandler := handlers.NewHealth(logger,&x)
+	redisObject := api.NewRedisObj()
+
+	checkHealthHandler := handlers.NewHealth(logger)
 	e.GET("/healthz",checkHealthHandler.Handle)
 
-	if err := e.Start(fmt.Sprintf(":%d", 8081)); err != nil {
+	redisHandler := handlers.NewRedis(&redisObject,logger)
+	e.POST("/redis",redisHandler.Handle)
+
+	if err := e.Start(fmt.Sprintf(":%d", 8083)); err != nil {
 		logger.Fatal("---Error While Serving---", zap.Error(err))
 	}
 }

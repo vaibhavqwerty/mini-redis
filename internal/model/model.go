@@ -5,8 +5,8 @@ import (
 )
 
 type TimeStore struct{
-	entryTime time.Time
-	duration int64
+	EntryTime time.Time
+	Duration int64
 }
 
 

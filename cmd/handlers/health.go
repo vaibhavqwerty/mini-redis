@@ -4,28 +4,23 @@ import (
 	"net/http"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
-	"fmt"
 )
 
 type HealthStatus struct {
 	log *zap.Logger
-	x *int32
 }
 
-func NewHealth(log *zap.Logger, x *int32) HealthStatus{
+func NewHealth(log *zap.Logger) HealthStatus{
 	return HealthStatus{
 		log: log,
-		x: x,
 	}
 }
 
 func (h HealthStatus) Handle(c echo.Context) (err error){
 	
-	if 1==1{
+	if true{
 
-		h.log.Info("---health check---")
-		*h.x=*(h.x)+1
-		fmt.Println(*h.x)
+		h.log.Info("----health check---")
 		return c.String(http.StatusOK,"OK")
 	}
 
