@@ -21,7 +21,19 @@ func NewRedisObj() RedisObj{
 
 
 func (r *RedisObj)Get(key string) string{
+	val,ok1 := r.timeStore[key]
+	if ok1{
+		diff := time.Since(val.EntryTime)
+		dur2 := diff.Seconds()
+		if(dur2>=float64(val.Duration)){
+			delete(r.valStore,key)
+			delete(r.timeStore,key)
+			return "-2"
+		}
+	}
+
 	return r.valStore[key]
+	
 }
 
 func (r *RedisObj)Set(key string, val string) string{
@@ -31,8 +43,12 @@ func (r *RedisObj)Set(key string, val string) string{
 
 func (r *RedisObj)Del(key string) string{
 	_,ok := r.valStore[key]
+	_,ok1 := r.timeStore[key]
 	if ok{
 		delete(r.valStore,key)
+		if ok1{
+			delete(r.timeStore,key)	
+		}
 		return "1"
 	}
 
@@ -43,6 +59,19 @@ func(r *RedisObj)Keys(st string) string{
 	regex, _ := regexp.Compile(st)
 	ans := ""
 	for key := range r.valStore{
+
+		val,ok1 := r.timeStore[key]
+
+		if ok1{
+			diff := time.Since(val.EntryTime)
+			dur2 := diff.Seconds()
+			if(dur2>=float64(val.Duration)){
+				delete(r.valStore,key)
+				delete(r.timeStore,key)
+				continue
+			}
+		}
+
 		if regex.MatchString(key){
 			if ans==""{
 				ans=ans+key;
